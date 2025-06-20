@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlavorCraft - Digital Recipe Collection</title>
+    
+    <!-- Analytics Scripts Placeholder -->
+    <!-- Google Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script> -->
+    
+    <!-- Microsoft Clarity -->
+    <!-- <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "CLARITY_PROJECT_ID");
+    </script> -->
+    
+    <!-- Hotjar -->
+    <!-- <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:HOTJAR_SITE_ID,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script> -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-bar {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            width: 200px;
+        }
+        
+        .search-bar:focus {
+            border-color: #667eea;
+        }
+        
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            background: #5a67d8;
+        }
+        
+        /* Page Content */
+        .page {
+            display: none;
+            background: white;
+            margin: 2rem 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .page-content {
+            padding: 3rem 2rem;
+        }
+        
+        /* Recipe Cards */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .recipe-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .recipe-image {
+            height: 200px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .recipe-info {
+            padding: 1.5rem;
+        }
+        
+        .recipe-info h3 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        
+        .btn-download {
+            background: #ed8936;
+        }
+        
+        .btn-download:hover {
+            background: #dd6b20;
+        }
+        
+        /* CTA Sections */
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+            margin: 3rem 0;
+            border-radius: 20px;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #667eea;
+        }
+        
+        /* Meal Planner */
+        .meal-planner {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .day-column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .day-header {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .meal-slot {
+            background: white;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .meal-slot:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .meal-slot.filled {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .gallery-item {
+            height: 200px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48bb78, #4299e1);
+            background-size: 400% 400%;
+            animation: gradientShift 6s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .meal-planner {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo" onclick="showPage('home')">🍳 FlavorCraft</a>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="showPage('home')" class="nav-link active">Home</a></li>
+                    <li><a href="#" onclick="showPage('recipes')" class="nav-link">Recipes</a></li>
+                    <li><a href="#" onclick="showPage('planner')" class="nav-link">Meal Planner</a></li>
+                    <li><a href="#" onclick="showPage('about')" class="nav-link">About</a></li>
+                    <li><a href="#" onclick="showPage('gallery')" class="nav-link">Gallery</a></li>
+                    <li><a href="#" onclick="showPage('contact')" class="nav-link">Contact</a></li>
+                </ul>
+                <div class="search-container">
+                    <input type="text" class="search-bar" placeholder="Search recipes..." id="searchInput">
+                    <button class="search-btn" onclick="performSearch()">🔍</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="page-header">
+                <h1>Welcome to FlavorCraft</h1>
+                <p>Your digital companion for recipe collection and meal planning</p>
+            </div>
+            <div class="page-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-label">Recipes Available</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">856</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">423</div>
+                        <div class="stat-label">Meal Plans Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Satisfaction Rate</div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <h2>Start Your Culinary Journey</h2>
+                    <p>Discover amazing recipes, plan your meals, and become the chef you've always wanted to be!</p>
+                    <button class="btn" onclick="showPage('recipes')">Explore Recipes</button>
+                    <button class="btn btn-secondary" onclick="showPage('planner')">Create Meal Plan</button>
+                    <button class="btn btn-download" onclick="downloadGuide()">📥 Download Cooking Guide</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipes Page -->
+        <div id="recipes" class="page">
+            <div class="page-header">
+                <h1>Recipe Collection</h1>
+                <p>Discover delicious recipes from around the world</p>
+            </div>
+            <div class="page-content">
+                <div class="recipe-grid">
+                    <div class="recipe-card" onclick="viewRecipe('Pasta Carbonara')">
+                        <div class="recipe-image">🍝</div>
+                        <div class="recipe-info">
+                            <h3>Classic Pasta Carbonara</h3>
+                            <p>Creamy Italian pasta with eggs, cheese, and pancetta</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 25 mins</span>
+                                <span>👥 4 servings</span>
+                                <span>⭐ 4.8/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-card" onclick="viewRecipe('Chicken Teriyaki')">
+                        <div class="recipe-image">🍗</div>
+                        <div class="recipe-info">
+                            <h3>Honey Teriyaki Chicken</h3>
+                            <p>Sweet and savory glazed chicken with vegetables</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 35 mins</span>
+                                <span>👥 3 servings</span>
+                                <span>⭐ 4.6/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-card" onclick="viewRecipe('Vegetable Stir Fry')">
+                        <div class="recipe-image">🥗</div>
+                        <div class="recipe-info">
+                            <h3>Rainbow Vegetable Stir Fry</h3>
+                            <p>Fresh, colorful vegetables in aromatic Asian sauce</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 15 mins</span>
+                                <span>👥 2 servings</span>
+                                <span>⭐ 4.7/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-card" onclick="viewRecipe('Chocolate Cake')">
+                        <div class="recipe-image">🍰</div>
+                        <div class="recipe-info">
+                            <h3>Decadent Chocolate Cake</h3>
+                            <p>Rich, moist chocolate cake with creamy frosting</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 90 mins</span>
+                                <span>👥 8 servings</span>
+                                <span>⭐ 4.9/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-card" onclick="viewRecipe('Greek Salad')">
+                        <div class="recipe-image">🥙</div>
+                        <div class="recipe-info">
+                            <h3>Traditional Greek Salad</h3>
+                            <p>Fresh Mediterranean salad with feta and olives</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 10 mins</span>
+                                <span>👥 4 servings</span>
+                                <span>⭐ 4.5/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-card" onclick="viewRecipe('Fish Tacos')">
+                        <div class="recipe-image">🌮</div>
+                        <div class="recipe-info">
+                            <h3>Baja Fish Tacos</h3>
+                            <p>Crispy fish with fresh slaw and lime crema</p>
+                            <div class="recipe-meta">
+                                <span>⏱️ 30 mins</span>
+                                <span>👥 4 servings</span>
+                                <span>⭐ 4.8/5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <h2>Can't Find What You're Looking For?</h2>
+                    <p>Submit a recipe request and our community will help you find it!</p>
+                    <button class="btn" onclick="showPage('contact')">Request Recipe</button>
+                    <button class="btn btn-download" onclick="downloadRecipeBook()">📥 Download Recipe Book</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Planner Page -->
+        <div id="planner" class="page">
+            <div class="page-header">
+                <h1>Weekly Meal Planner</h1>
+                <p>Plan your meals for the week and stay organized</p>
+            </div>
+            <div class="page-content">
+                <div class="meal-planner">
+                    <div class="day-column">
+                        <div class="day-header">Monday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Tuesday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Wednesday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Thursday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Friday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Saturday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="day-header">Sunday</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Breakfast</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Lunch</div>
+                        <div class="meal-slot" onclick="addMeal(this)">+ Dinner</div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <h2>Ready to Start Meal Planning?</h2>
+                    <p>Generate a shopping list and get organized for the week ahead!</p>
+                    <button class="btn" onclick="generateShoppingList()">Generate Shopping List</button>
+                    <button class="btn btn-secondary" onclick="saveMealPlan()">Save Meal Plan</button>
+                    <button class="btn btn-download" onclick="downloadMealPlan()">📥 Download Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="about" class="page">
+            <div class="page-header">
+                <h1>About FlavorCraft</h1>
+                <p>Bringing culinary creativity to your kitchen since 2023</p>
+            </div>
+            <div class="page-content">
+                <h2>Our Mission</h2>
+                <p>FlavorCraft was born from a simple idea: cooking should be accessible, enjoyable, and creative for everyone. We believe that great meals bring people together and that everyone deserves to experience the joy of creating delicious food.</p>
+                
+                <h2>What We Offer</h2>
+                <p>Our platform provides a comprehensive suite of tools for home cooks of all skill levels. From our extensive recipe database to our intuitive meal planning system, we're here to support your culinary journey every step of the way.</p>
+                
+                <h2>Our Community</h2>
+                <p>With over 856 active users and growing, FlavorCraft has become a vibrant community of food enthusiasts. Share your creations, discover new favorites, and connect with fellow cooking enthusiasts from around the world.</p>
+                
+                <div class="cta-section">
+                    <h2>Join Our Community</h2>
+                    <p>Ready to embark on your culinary adventure? Join thousands of home cooks who have already discovered the joy of FlavorCraft!</p>
+                    <button class="btn" onclick="showPage('contact')">Get Started Today</button>
+                    <button class="btn btn-download" onclick="downloadApp()">📥 Download Mobile App</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Page -->
+        <div id="gallery" class="page">
+            <div class="page-header">
+                <h1>Recipe Gallery</h1>
+                <p>Visual inspiration from our community of food creators</p>
+            </div>
+            <div class="page-content">
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="viewImage('Breakfast Bowl')">🍓</div>
+                    <div class="gallery-item" onclick="viewImage('Gourmet Burger')">🍔</div>
+                    <div class="gallery-item" onclick="viewImage('Fresh Sushi')">🍣</div>
+                    <div class="gallery-item" onclick="viewImage('Pizza Margherita')">🍕</div>
+                    <div class="gallery-item" onclick="viewImage('Colorful Smoothie')">🥤</div>
+                    <div class="gallery-item" onclick="viewImage('Grilled Vegetables')">🥕</div>
+                    <div class="gallery-item" onclick="viewImage('Artisan Bread')">🍞</div>
+                    <div class="gallery-item" onclick="viewImage('Tropical Dessert')">🥥</div>
+                    <div class="gallery-item" onclick="viewImage('Herb Garden')">🌿</div>
+                    <div class="gallery-item" onclick="viewImage('Wine Pairing')">🍷</div>
+                    <div class="gallery-item" onclick="viewImage('Coffee Art')">☕</div>
+                    <div class="gallery-item" onclick="viewImage('Cheese Board')">🧀</div>
+                </div>
+                
+                <div class="cta-section">
+                    <h2>Share Your Creations</h2>
+                    <p>Upload photos of your culinary masterpieces and inspire others in our community!</p>
+                    <button class="btn" onclick="uploadPhoto()">Upload Photo</button>
+                    <button class="btn btn-secondary" onclick="showPage('contact')">Join Community</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <div class="page-header">
+                <h1>Get In Touch</h1>
+                <p>We'd love to hear from you! Share your feedback, questions, or recipe ideas</p>
+            </div>
+            <div class="page-content">
+                <form onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Select a topic</option>
+                            <option value="recipe-request">Recipe Request</option>
+                            <option value="feedback">General Feedback</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="partnership">Partnership Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="6" required placeholder="Tell us how we can help you..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Send Message</button>
+                    <button type="button" class="btn btn-secondary" onclick="subscribeNewsletter()">Subscribe to Newsletter</button>
+                </form>
+                
+                <div class="cta-section" style="margin-top: 3rem;">
+                    <h2>Stay Connected</h2>
+                    <p>Follow us on social media and never miss a recipe update or cooking tip!</p>
+                    <button class="btn btn-download" onclick="downloadContactInfo()">📥 Download Our Info</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Track page view (for analytics)
+            trackPageView(pageId);
+        }
+        
+        // Search Functionality
+        function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (query.trim()) {
+                // Update URL with search parameter
+                const url = new URL(window.location);
+                url.searchParams.set('q', query);
+                window.history.pushState({}, '', url);
+                
+                alert(`Searching for: "${query}"\n\nThis would normally filter recipes and show results!`);
+                trackSearch(query);
+            }
+        }
+        
+        // Recipe Interactions
+        function viewRecipe(recipeName) {
+            alert(`Opening recipe: ${recipeName}\n\nThis would show detailed cooking instructions, ingredients, and nutritional information!`);
+            trackRecipeView(recipeName);
+        }
+        
+        // Meal Planner Functions
+        function addMeal(element) {
+            const meals = ['Pancakes', 'Caesar Salad', 'Grilled Chicken', 'Vegetable Soup', 'Fish Tacos', 'Pasta Carbonara', 'Greek Salad', 'Chocolate Cake'];
+            const randomMeal = meals[Math.floor(Math.random() * meals.length)];
+            
+            element.textContent = randomMeal;
+            element.classList.add('filled');
+            
+            trackMealPlanAction('add_meal', randomMeal);
+        }
+        
+        function generateShoppingList() {
+            alert('🛒 Shopping List Generated!\n\nYour personalized shopping list has been created based on your meal plan. This would normally show:\n\n• Ingredients needed\n• Quantities required\n• Store suggestions\n• Price estimates');
+            trackConversion('shopping_list_generated');
+        }
+        
+        function saveMealPlan() {
+            alert('💾 Meal Plan Saved!\n\nYour weekly meal plan has been saved to your account. You can access it anytime from your dashboard!');
+            trackConversion('meal_plan_saved');
+        }
+        
+        // Download Functions (CTAs)
+        function downloadGuide() {
+            alert('📥 Downloading Cooking Guide...\n\nYour comprehensive cooking guide is being prepared! This 50-page PDF includes:\n\n• Essential cooking techniques\n• Kitchen equipment guide\n• Measurement conversions\n• Food safety tips');
+            trackConversion('guide_download');
+        }
+        
+        function downloadRecipeBook() {
+            alert('📥 Downloading Recipe Book...\n\nYour digital recipe collection is ready! This includes:\n\n• 100+ tested recipes\n• Photo instructions\n• Nutrition information\n• Shopping lists');
+            trackConversion('recipe_book_download');
+        }
+        
+        function downloadMealPlan() {
+            alert('📥 Downloading Meal Plan...\n\nYour personalized meal plan is being prepared as a PDF with:\n\n• Weekly schedule\n• Shopping list\n• Prep instructions\n• Nutritional breakdown');
+            trackConversion('meal_plan_download');
+        }
+        
+        function downloadApp() {
+            alert('📱 Redirecting to App Store...\n\nDownload the FlavorCraft mobile app for:\n\n• Offline recipe access\n• Kitchen timer integration\n• Voice-guided cooking\n• Community features');
+            trackConversion('app_download');
+        }
+        
+        function downloadContactInfo() {
+            alert('📥 Downloading Contact Information...\n\nThis vCard file includes:\n\n• Our contact details\n• Social media links\n• Support hours\n• Office locations');
+            trackConversion('contact_info_download');
+        }
+        
+        // Gallery Functions
+        function viewImage(imageName) {
+            alert(`🖼️ Viewing: ${imageName}\n\nThis would open a full-screen gallery view with:\n\n• High-resolution image\n• Recipe details\n• User comments\n• Share options`);
+            trackImageView(imageName);
+        }
+        
+        function uploadPhoto() {
+            alert('📸 Photo Upload\n\nThis would open a photo upload dialog where you can:\n\n• Select photos from your device\n• Add descriptions and tags\n• Share with the community\n• Link to recipes');
+            trackAction('photo_upload_initiated');
+        }
+        
+        // Form Functions
+        function submitContactForm(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+            
+            alert(`✅ Message Sent Successfully!\n\nThank you ${data.name}! We've received your message about "${data.subject}" and will respond to ${data.email} within 24 hours.`);
+            
+            // Reset form
+            event.target.reset();
+            
+            trackConversion('contact_form_submitted');
+        }
+        
+        function subscribeNewsletter() {
+            const email = document.getElementById('email').value;
+            if (email) {
+                alert(`📧 Newsletter Subscription\n\nThank you for subscribing with ${email}!\n\nYou'll receive:\n\n• Weekly recipe collections\n• Cooking tips and tricks\n• Exclusive content\n• Community highlights`);
+                trackConversion('newsletter_subscription');
+            } else {
+                alert('Please enter your email address first!');
+            }
+        }
+        
+        // Analytics Tracking Functions (Placeholders for actual analytics)
+        function trackPageView(page) {
+            console.log('Page View:', page);
+            // This is where you'd send data to Google Analytics, Clarity, Hotjar
+            // gtag('event', 'page_view', { page_title: page });
+        }
+        
+        function trackSearch(query) {
+            console.log('Search:', query);
+            // gtag('event', 'search', { search_term: query });
+        }
+        
+        function trackRecipeView(recipe) {
+            console.log('Recipe View:', recipe);
+            // gtag('event', 'view_item', { item_name: recipe, item_category: 'recipe' });
+        }
+        
+        function trackMealPlanAction(action, meal) {
+            console.log('Meal Plan Action:', action, meal);
+            // gtag('event', action, { meal_name: meal });
+        }
+        
+        function trackConversion(action) {
+            console.log('Conversion:', action);
+            // gtag('event', 'conversion', { action: action });
+        }
+        
+        function trackImageView(image) {
+            console.log('Image View:', image);
+            // gtag('event', 'view_image', { image_name: image });
+        }
+        
+        function trackAction(action) {
+            console.log('Action:', action);
+            // gtag('event', 'custom_action', { action: action });
+        }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for search parameter on load
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('q');
+            if (searchQuery) {
+                document.getElementById('searchInput').value = searchQuery;
+            }
+            
+            // Track initial page load
+            trackPageView('home');
+            
+            console.log('FlavorCraft Digital Recipe Collection loaded successfully!');
+            console.log('Ready for analytics integration with Google Analytics, Microsoft Clarity, and Hotjar');
+        });
+        
+        // Handle search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Simulate user engagement with scroll tracking
+        let hasScrolled = false;
+        window.addEventListener('scroll', function() {
+            if (!hasScrolled && window.scrollY > 100) {
+                hasScrolled = true;
+                trackAction('page_scroll');
+            }
+        });
+        
+        // Track time spent on page (simplified)
+        let pageStartTime = Date.now();
+        window.addEventListener('beforeunload', function() {
+            const timeSpent = Math.round((Date.now() - pageStartTime) / 1000);
+            console.log('Time spent on page:', timeSpent, 'seconds');
+            // This would be sent to analytics
+        });
+    </script>
+</body>
+</html>
